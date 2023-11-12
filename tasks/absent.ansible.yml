@@ -1,0 +1,6 @@
+---
+- name: Ensure nginx is removed
+  ansible.builtin.apt:
+    name: nginx
+    state: absent
+  become: true

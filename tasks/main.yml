@@ -1,0 +1,10 @@
+---
+- name: Configure nginx
+  ansible.builtin.include_tasks:
+    file: present.ansible.yml
+  when: nginx_state == 'present'
+
+- name: Remove nginx
+  ansible.builtin.include_tasks:
+    file: absent.ansible.yml
+  when: nginx_state == 'absent'

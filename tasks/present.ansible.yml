@@ -1,0 +1,9 @@
+---
+- name: Ensure nginx and snakeoil cert is installed
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - ssl-cert
+    state: present
+    cache_valid_time: 3600
+  become: true

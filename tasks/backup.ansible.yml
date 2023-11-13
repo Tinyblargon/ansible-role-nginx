@@ -1,0 +1,19 @@
+---
+- name: Ensure backup directory exists
+  ansible.builtin.file:
+    path: "{{ nginx_backup_file | dirname }}"
+    state: directory
+    owner: "{{ omit }}"
+    group: "{{ omit }}"
+    mode: "{{ omit }}"
+  become: true
+
+- name: Create backup archive
+  community.general.archive:
+    path: "{{ nginx_path }}"
+    dest: "{{ nginx_backup_file }}"
+    format: gz
+    owner: root
+    group: root
+    mode: "0600"
+  become: true

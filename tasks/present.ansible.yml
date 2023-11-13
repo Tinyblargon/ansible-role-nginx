@@ -15,6 +15,11 @@
     enabled: true
   become: true
 
+- name: Backup nginx
+  ansible.builtin.include_tasks:
+    file: backup.ansible.yml
+  when: nginx_backup_condition
+
 - name: Configure vhosts
   ansible.builtin.include_tasks:
     file: vhosts.ansible.yml
@@ -25,5 +30,25 @@
     file: vhosts_remove.ansible.yml
   when: nginx_vhosts_remove
 
+- name: Test nginx config
+  ansible.builtin.command:
+    cmd: nginx -t
+  register: nginx_test
+  ignore_errors: true
+  changed_when: false
+  no_log: true
+  become: true
+  when: nginx_backup_condition
+
+- name: Restore/delete nginx backup
+  ansible.builtin.include_tasks:
+    file: restore.ansible.yml
+  when: nginx_backup_condition
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
+
+- name: Invalid nginx config
+  ansible.builtin.fail:
+    msg: "{{ nginx_test.stderr_lines }}"
+  when: nginx_test.failed is defined and nginx_test.failed

@@ -5,3 +5,6 @@ nginx_get_key: >-
   {{ item.content | regex_search('\n\s*ssl_certificate_key\s+([^;]+);', '\1') }}
 
 nginx_path: /etc/nginx
+
+nginx_backup_condition: >-
+  {{ true if nginx_backup and nginx_vhosts | length > 0 else false }}

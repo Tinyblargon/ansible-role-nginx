@@ -2,5 +2,7 @@
 nginx_vhosts: []
 nginx_vhosts_remove: false
 nginx_state: "present"
+nginx_backup: true
+nginx_backup_file: "/etc/nginx.backup/nginx.tar.gz"
 nginx_default_cert: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
 nginx_default_key: "/etc/ssl/private/ssl-cert-snakeoil.key"

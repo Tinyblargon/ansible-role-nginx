@@ -19,3 +19,11 @@
   ansible.builtin.include_tasks:
     file: vhosts.ansible.yml
   when: nginx_vhosts | length > 0
+
+- name: Remove unspecified vhosts
+  ansible.builtin.include_tasks:
+    file: vhosts_remove.ansible.yml
+  when: nginx_vhosts_remove
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

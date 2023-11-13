@@ -10,12 +10,13 @@ N/A
 
 ### Defaults
 
-| **Variable Name**  | **Type**| **Default Value**                       | **Description**|
-| :------------------| :------:| :--------------------------------------:| :--------------|
-| nginx_vhosts:      | list map| []                                      | List of vhosts, see:[Nginx_vhosts](#nginx_vhosts).|
-| nginx_state:       | string  | "present"                               | When `"present"` nginx will be installed and configured, when `"absent"` nginx will be removed.|
-| nginx_default_cert:| string  | "/etc/ssl/certs/ssl-cert-snakeoil.pem"  | The path to the default cert file. When `ssl_certificate` has a nonexistent file configured it will be substituted for this cert.|
-| nginx_default_key: | string  | "/etc/ssl/private/ssl-cert-snakeoil.key"| The path to the default key file. When `ssl_certificate_key` has a nonexistent file configured it will be substituted for this key.|
+| **Variable Name**   | **Type**| **Default Value**                       | **Description**|
+| :-------------------| :------:| :--------------------------------------:| :--------------|
+| nginx_vhosts:       | list map| []                                      | List of vhosts, see:[Nginx_vhosts](#nginx_vhosts).|
+| nginx_vhosts_remove:| bool    | false                                   | When `true` all vhosts that are not in `nginx_vhosts:` will be removed.|
+| nginx_state:        | string  | "present"                               | When `"present"` nginx will be installed and configured, when `"absent"` nginx will be removed.|
+| nginx_default_cert: | string  | "/etc/ssl/certs/ssl-cert-snakeoil.pem"  | The path to the default cert file. When `ssl_certificate` has a nonexistent file configured it will be substituted for this cert.|
+| nginx_default_key:  | string  | "/etc/ssl/private/ssl-cert-snakeoil.key"| The path to the default key file. When `ssl_certificate_key` has a nonexistent file configured it will be substituted for this key.|
 
 ### Nginx_vhosts
 
@@ -47,6 +48,7 @@ N/A
             enabled: false
           - name: "default"
             state: "absent"
+        nginx_vhosts_remove: true
         nginx_state: "present"
 ```
 

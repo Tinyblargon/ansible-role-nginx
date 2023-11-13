@@ -1,5 +1,6 @@
 ---
 nginx_vhosts: []
+nginx_vhosts_remove: false
 nginx_state: "present"
 nginx_default_cert: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
 nginx_default_key: "/etc/ssl/private/ssl-cert-snakeoil.key"

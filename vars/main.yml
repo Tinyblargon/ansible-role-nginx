@@ -1,0 +1,7 @@
+---
+nginx_get_cert: >-
+  {{ item.content | regex_search('\n\s*ssl_certificate\s+([^;]+);', '\1') }}
+nginx_get_key: >-
+  {{ item.content | regex_search('\n\s*ssl_certificate_key\s+([^;]+);', '\1') }}
+
+nginx_path: /etc/nginx

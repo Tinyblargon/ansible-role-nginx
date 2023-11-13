@@ -7,3 +7,15 @@
     state: present
     cache_valid_time: 3600
   become: true
+
+- name: Ensure nginx is running and enabled
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+
+- name: Configure vhosts
+  ansible.builtin.include_tasks:
+    file: vhosts.ansible.yml
+  when: nginx_vhosts | length > 0

@@ -1,0 +1,105 @@
+---
+- name: Build list of certs
+  ansible.builtin.set_fact:
+    nginx_certs_paths: >-
+      {{ nginx_certs_paths | default([]) +
+      ([nginx_get_cert | first | default(''),
+      nginx_get_key | first | default('')] | reject('equalto', '')) }}
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not item.state is defined or item.state == 'present'
+
+- name: Check if certs files exist
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    follow: true
+    get_checksum: false
+    get_attributes: true
+    get_mime: true
+  loop: "{{ nginx_certs_paths | unique }}"
+  loop_control:
+    label: "{{ item }}"
+  register: file_stat
+  become: true
+
+# replance the cert and key if they exist and either the cert or key is invalid
+# replace the cert if it exists and is invalid
+# replace the key if it exists and is invalid
+# otherwise do nothing
+- name: Add sites
+  ansible.builtin.copy:
+    dest: "{{ nginx_path + '/sites-available/' + item.name }}"
+    content: |-
+      # Ansible managed
+      {{ item.content |
+      regex_replace(nginx_cert_match[0].item + ';', nginx_default_cert + ';') |
+      regex_replace(nginx_key_match[0].item + ';', nginx_default_key + ';')
+      if nginx_get_cert | length > 0 and nginx_get_key | length > 0
+      and (not nginx_cert_match[0].stat.exists
+      or nginx_cert_match[0].stat.isdir
+      or not nginx_key_match[0].stat.exists
+      or nginx_key_match[0].stat.isdir)
+      else item.content |
+      regex_replace(nginx_cert_match[0].item + ';', nginx_default_cert + ';')
+      if nginx_get_cert | length > 0
+      and (not nginx_cert_match[0].stat.exists
+      or nginx_cert_match[0].stat.isdir)
+      else item.content |
+      regex_replace(nginx_key_match[0].item + ';', nginx_default_key + ';')
+      if nginx_get_key | length > 0
+      and (not nginx_key_match[0].stat.exists
+      or nginx_key_match[0].stat.isdir)
+      else item.content }}
+    mode: '0644'
+  vars:
+    nginx_cert_match: >-
+      {{ (file_stat.results |
+      selectattr('item', 'equalto', nginx_get_cert | first)) }}
+    nginx_key_match: >-
+      {{ (file_stat.results |
+      selectattr('item', 'equalto', nginx_get_key | first)) }}
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: not item.state is defined or item.state == 'present'
+  become: true
+  notify: Reload nginx
+
+- name: Enable sites
+  ansible.builtin.file:
+    src: "{{ nginx_path + '/sites-available/' + item.name }}"
+    dest: "{{ nginx_path + '/sites-enabled/' + item.name }}"
+    state: link
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: >-
+    (not item.state is defined or item.state == 'present')
+    and (not item.enabled is defined or item.enabled)
+  become: true
+  notify: Reload nginx
+
+- name: Disable sites
+  ansible.builtin.file:
+    dest: "{{ nginx_path + '/sites-enabled/' + item.name }}"
+    state: absent
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: >-
+    (item.state is defined and item.state == 'absent')
+    or (item.enabled is defined and not item.enabled)
+  become: true
+  notify: Reload nginx
+
+- name: Remove sites
+  ansible.builtin.file:
+    path: "{{ nginx_path + '/sites-available/' + item.name }}"
+    state: absent
+  loop: "{{ nginx_vhosts }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state is defined and item.state == 'absent'
+  become: true
+  notify: Reload nginx

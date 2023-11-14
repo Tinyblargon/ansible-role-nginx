@@ -8,3 +8,5 @@ nginx_path: /etc/nginx
 
 nginx_backup_condition: >-
   {{ true if nginx_backup and nginx_vhosts | length > 0 else false }}
+nginx_previous_restore_condition: >-
+  {{ true if nginx_backup and nginx_backup_exists.stat.exists else false }}

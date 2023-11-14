@@ -8,12 +8,29 @@
     cache_valid_time: 3600
   become: true
 
+- name: Check if backup exists
+  ansible.builtin.stat:
+    path: "{{ nginx_backup_file }}"
+  register: nginx_backup_exists
+  when: nginx_backup
+  become: true
+
+# Restore in case the connection was lost mid configuration
+- name: Restore nginx from previous run
+  ansible.builtin.include_tasks:
+    file: restore.ansible.yml
+  when: nginx_previous_restore_condition
+
 - name: Ensure nginx is running and enabled
   ansible.builtin.systemd:
     name: nginx
     state: started
     enabled: true
   become: true
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  when: nginx_previous_restore_condition
 
 - name: Backup nginx
   ansible.builtin.include_tasks:

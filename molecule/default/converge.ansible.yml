@@ -67,4 +67,3 @@
               {{ lookup('file', tempdir.path + '/site-1.nginx.config') }}
         nginx_vhosts_remove: true
         nginx_state: "present"
-

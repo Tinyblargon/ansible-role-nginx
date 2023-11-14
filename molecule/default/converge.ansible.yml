@@ -1,0 +1,56 @@
+---
+- name: Converge
+  hosts: localhost
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache.
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 900
+      when: ansible_os_family == 'Debian'
+
+    - name: Wait for systemd to complete initialization.
+      ansible.builtin.command: systemctl is-system-running
+      register: systemctl_status
+      until: >
+        'running' in systemctl_status.stdout or
+        'degraded' in systemctl_status.stdout
+      retries: 30
+      delay: 5
+      when: ansible_service_mgr == 'systemd'
+      changed_when: false
+      failed_when: systemctl_status.rc > 1
+
+  roles:
+    - role: Tinyblargon.nginx
+      vars:
+        nginx_vhosts:
+          - name: "site-1"
+            content: |-
+              server {
+                  listen 80 default_server;
+                  server_name _;
+                  return 301 https://$http_host$request_uri;
+              }
+              server {
+                  listen 443 ssl http2 default_server;
+                  server_name _;
+                  ssl_certificate             /invalid/path/cert.pem;
+                  ssl_certificate_key         /invalid/path/privkey.pem;
+                  ssl_protocols               TLSv1.3;
+                  ssl_prefer_server_ciphers   on;
+                  ssl_session_cache           shared:SSL:10m;
+                  #
+                  location / {
+                      proxy_pass          https://localhost:8080;
+                      proxy_http_version  1.1;
+                      proxy_set_header    Host        $host;
+                      proxy_set_header    X-Real-IP   $remote_addr;
+                      proxy_set_header    Upgrade     $http_upgrade;
+                      proxy_set_header    Connection  'upgrade';
+                      proxy_cache_bypass  $http_upgrade;
+                  }
+              }
+        nginx_vhosts_remove: true
+        nginx_state: "present"

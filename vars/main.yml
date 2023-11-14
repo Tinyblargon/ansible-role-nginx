@@ -10,3 +10,7 @@ nginx_backup_condition: >-
   {{ nginx_backup and nginx_vhosts | length > 0 }}
 nginx_previous_restore_condition: >-
   {{ nginx_backup and nginx_backup_exists.stat.exists }}
+
+nginx_vhost_disable_condition: >-
+  {{ (item.state is defined and item.state == 'absent')
+  or (item.enabled is defined and not item.enabled) }}

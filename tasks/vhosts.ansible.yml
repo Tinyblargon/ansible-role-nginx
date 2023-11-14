@@ -74,9 +74,7 @@
   loop: "{{ nginx_vhosts }}"
   loop_control:
     label: "{{ item.name }}"
-  when: >-
-    (not item.state is defined or item.state == 'present')
-    and (not item.enabled is defined or item.enabled)
+  when: not nginx_vhost_disable_condition
   become: true
   notify: Reload nginx
 
@@ -87,9 +85,7 @@
   loop: "{{ nginx_vhosts }}"
   loop_control:
     label: "{{ item.name }}"
-  when: >-
-    (item.state is defined and item.state == 'absent')
-    or (item.enabled is defined and not item.enabled)
+  when: nginx_vhost_disable_condition
   become: true
   notify: Reload nginx
 

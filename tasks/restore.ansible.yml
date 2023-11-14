@@ -19,4 +19,5 @@
   ansible.builtin.file:
     path: "{{ nginx_backup_file }}"
     state: absent
+  changed_when: false
   become: true

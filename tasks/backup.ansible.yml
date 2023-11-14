@@ -16,4 +16,5 @@
     owner: root
     group: root
     mode: "0600"
+  changed_when: false
   become: true

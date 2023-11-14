@@ -1,6 +1,6 @@
 # Ansible Role: nginx
 
-Install and configure nginx
+Install and configure nginx.
 
 This solution addresses the circular dependency problem between nginx and Letsencrypt's Certbot. If certificate files are missing, the system substitutes them with `nginx_default_cert:` and `nginx_default_key:` in the nginx configuration. Once the actual certificates are installed on the system, re-running this role will direct nginx to use these new certificates, replacing the temporary ones.
 

@@ -27,7 +27,7 @@
 # replace the cert if it exists and is invalid
 # replace the key if it exists and is invalid
 # otherwise do nothing
-- name: Add sites
+- name: Add vhosts
   ansible.builtin.copy:
     dest: "{{ nginx_path + '/sites-available/' + item.name }}"
     content: |-
@@ -66,7 +66,7 @@
   become: true
   notify: Reload nginx
 
-- name: Enable sites
+- name: Enable vhosts
   ansible.builtin.file:
     src: "{{ nginx_path + '/sites-available/' + item.name }}"
     dest: "{{ nginx_path + '/sites-enabled/' + item.name }}"
@@ -74,26 +74,22 @@
   loop: "{{ nginx_vhosts }}"
   loop_control:
     label: "{{ item.name }}"
-  when: >-
-    (not item.state is defined or item.state == 'present')
-    and (not item.enabled is defined or item.enabled)
+  when: not nginx_vhost_disable_condition
   become: true
   notify: Reload nginx
 
-- name: Disable sites
+- name: Disable vhosts
   ansible.builtin.file:
     dest: "{{ nginx_path + '/sites-enabled/' + item.name }}"
     state: absent
   loop: "{{ nginx_vhosts }}"
   loop_control:
     label: "{{ item.name }}"
-  when: >-
-    (item.state is defined and item.state == 'absent')
-    or (item.enabled is defined and not item.enabled)
+  when: nginx_vhost_disable_condition
   become: true
   notify: Reload nginx
 
-- name: Remove sites
+- name: Remove vhosts
   ansible.builtin.file:
     path: "{{ nginx_path + '/sites-available/' + item.name }}"
     state: absent

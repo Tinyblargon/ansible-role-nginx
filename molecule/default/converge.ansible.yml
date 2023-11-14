@@ -22,48 +22,35 @@
       changed_when: false
       failed_when: systemctl_status.rc > 1
 
-    - name: Create tmp dir for nginx test files
-      ansible.builtin.tempfile:
-        state: directory
-      register: tempdir
-      changed_when: false
-
-    - name: Create mnginx vhost file for test deployment
-      ansible.builtin.copy:
-        content: |-
-          server {
-              listen 80 default_server;
-              server_name _;
-              return 301 https://$http_host$request_uri;
-          }
-          server {
-              listen 443 ssl http2 default_server;
-              server_name _;
-              ssl_certificate             /invalid/path/cert.pem;
-              ssl_certificate_key         /invalid/path/privkey.pem;
-              ssl_protocols               TLSv1.3;
-              ssl_prefer_server_ciphers   on;
-              ssl_session_cache           shared:SSL:10m;
-              #
-              location / {
-                  proxy_pass          https://localhost:8080;
-                  proxy_http_version  1.1;
-                  proxy_set_header    Host        $host;
-                  proxy_set_header    X-Real-IP   $remote_addr;
-                  proxy_set_header    Upgrade     $http_upgrade;
-                  proxy_set_header    Connection  'upgrade';
-                  proxy_cache_bypass  $http_upgrade;
-              }
-          }
-        dest: "{{ tempdir.path }}/site-1.nginx.config"
-      changed_when: false
-
   roles:
     - role: Tinyblargon.nginx
       vars:
         nginx_vhosts:
           - name: "site-1"
-            content: >-
-              {{ lookup('file', tempdir.path + '/site-1.nginx.config') }}
+            content: |-
+              server {
+                  listen 80 default_server;
+                  server_name _;
+                  return 301 https://$http_host$request_uri;
+              }
+              server {
+                  listen 443 ssl http2 default_server;
+                  server_name _;
+                  ssl_certificate             /invalid/path/cert.pem;
+                  ssl_certificate_key         /invalid/path/privkey.pem;
+                  ssl_protocols               TLSv1.3;
+                  ssl_prefer_server_ciphers   on;
+                  ssl_session_cache           shared:SSL:10m;
+                  #
+                  location / {
+                      proxy_pass          https://localhost:8080;
+                      proxy_http_version  1.1;
+                      proxy_set_header    Host        $host;
+                      proxy_set_header    X-Real-IP   $remote_addr;
+                      proxy_set_header    Upgrade     $http_upgrade;
+                      proxy_set_header    Connection  'upgrade';
+                      proxy_cache_bypass  $http_upgrade;
+                  }
+              }
         nginx_vhosts_remove: true
         nginx_state: "present"

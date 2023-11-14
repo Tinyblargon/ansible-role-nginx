@@ -7,6 +7,6 @@ nginx_get_key: >-
 nginx_path: /etc/nginx
 
 nginx_backup_condition: >-
-  {{ true if nginx_backup and nginx_vhosts | length > 0 else false }}
+  {{ nginx_backup and nginx_vhosts | length > 0 }}
 nginx_previous_restore_condition: >-
-  {{ true if nginx_backup and nginx_backup_exists.stat.exists else false }}
+  {{ nginx_backup and nginx_backup_exists.stat.exists }}

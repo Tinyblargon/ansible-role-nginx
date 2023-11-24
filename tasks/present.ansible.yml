@@ -30,7 +30,6 @@
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
-  when: nginx_previous_restore_condition
 
 - name: Backup nginx
   ansible.builtin.include_tasks:

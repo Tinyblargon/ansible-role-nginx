@@ -46,25 +46,33 @@
     file: vhosts_remove.ansible.yml
   when: nginx_vhosts_remove
 
-- name: Test nginx config
-  ansible.builtin.command:
-    cmd: nginx -t
-  register: nginx_test
-  ignore_errors: true
-  changed_when: false
-  no_log: true
-  become: true
-  when: nginx_backup_condition
+- name: Validate nginx config
+  block:
+    - name: Test nginx config
+      ansible.builtin.command:
+        cmd: nginx -t
+      changed_when: false
+      no_log: true
+      become: true
+      when: nginx_backup_condition
+  rescue:
+    - name: Restore nginx backup
+      ansible.builtin.include_tasks:
+        file: restore.ansible.yml
+      when: nginx_backup_condition
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+    - name: Invalid nginx config
+      ansible.builtin.fail:
+        msg: "{{ ansible_failed_result.stderr_lines }}"
 
-- name: Restore/delete nginx backup
-  ansible.builtin.include_tasks:
-    file: restore.ansible.yml
+- name: Delete backup
+  ansible.builtin.file:
+    path: "{{ nginx_backup_file }}"
+    state: absent
+  changed_when: false
+  become: true
   when: nginx_backup_condition
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
-
-- name: Invalid nginx config
-  ansible.builtin.fail:
-    msg: "{{ nginx_test.stderr_lines }}"
-  when: nginx_test.failed is defined and nginx_test.failed

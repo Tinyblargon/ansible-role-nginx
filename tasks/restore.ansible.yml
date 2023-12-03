@@ -4,7 +4,6 @@
     path: "{{ nginx_path }}"
     state: absent
   become: true
-  when: not nginx_test is defined or nginx_test.failed
 
 - name: Restore backup
   ansible.builtin.unarchive:
@@ -12,7 +11,6 @@
     dest: "{{ nginx_path | dirname }}"
     remote_src: true
   become: true
-  when: not nginx_test is defined or nginx_test.failed
   notify: Reload nginx
 
 - name: Delete backup

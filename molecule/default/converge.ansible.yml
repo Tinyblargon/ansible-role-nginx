@@ -23,7 +23,7 @@
       failed_when: systemctl_status.rc > 1
 
   roles:
-    - role: Tinyblargon.nginx
+    - role: tinyblargon.nginx
       vars:
         nginx_vhosts:
           - name: "site-1"

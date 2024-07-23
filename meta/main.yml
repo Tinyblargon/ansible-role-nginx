@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   role_name: nginx
+  namespace: tinyblargon
   author: Tinyblargon
   description: >-
     Install and configure nginx.

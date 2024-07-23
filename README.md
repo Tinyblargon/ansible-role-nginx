@@ -44,7 +44,7 @@ N/A
 ```yaml
 - hosts: all
   roles:
-    - role: Tinyblargon.nginx
+    - role: tinyblargon.nginx
       vars:
         nginx_vhosts:
           - name: "site-1"

@@ -51,7 +51,7 @@
       and (not nginx_key_match[0].stat.exists
       or nginx_key_match[0].stat.isdir)
       else item.content }}
-    mode: '0644'
+    mode: "0644"
   vars:
     nginx_cert_match: >-
       {{ (file_stat.results |

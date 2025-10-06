@@ -37,14 +37,14 @@ jobs:
     name: Molecule
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         distro:
+          - ubuntu2404
           - ubuntu2204
-          - ubuntu2004
-          - ubuntu1804
+          - debian13
           - debian12
           - debian11
-          - debian10
 
     steps:
       - name: Check out the codebase.

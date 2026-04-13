@@ -2,9 +2,7 @@
 - name: Build list of certs
   ansible.builtin.set_fact:
     nginx_certs_paths: >-
-      {{ nginx_certs_paths | default([]) +
-      ([nginx_get_cert | first | default(''),
-      nginx_get_key | first | default('')] | reject('equalto', '')) }}
+      {{ nginx_certs_paths | default([]) + nginx_get_info | default([]) }}
   loop: "{{ nginx_vhosts }}"
   loop_control:
     label: "{{ item.name }}"

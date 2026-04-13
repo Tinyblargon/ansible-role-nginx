@@ -2,21 +2,26 @@
 name: CI
 'on':
   pull_request:
+    paths-ignore:
+      - '*.md'
+      - '.gitignore'
   push:
     branches:
       - main
+    paths-ignore:
+      - '*.md'
+      - '.gitignore'
   schedule:
     - cron: "0 9 * * 1"
-
-defaults:
-  run:
-    working-directory: 'tinyblargon.nginx'
 
 jobs:
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tinyblargon.nginx
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5
@@ -33,9 +38,30 @@ jobs:
       - name: Lint code.
         run: ansible-lint
 
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the codebase.
+        uses: actions/checkout@v5
+
+      - name: Set up Python 3.
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies.
+        run: pip3 install ansible
+      - name: Run unit test playbook.
+        run: make unit_test
+
   molecule:
     name: Molecule
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tinyblargon.nginx
     strategy:
       fail-fast: false
       matrix:

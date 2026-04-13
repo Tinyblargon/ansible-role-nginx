@@ -1,0 +1,29 @@
+---
+- name: Test nginx_get_cert
+  ansible.builtin.assert:
+    that: nginx_get_cert == test_item.output
+    fail_msg: >-
+      {{ 'Test: ' + test_item.name + ', Expected: ' + test_item.output | string
+      + ' , but got: ' + nginx_get_cert | string }}
+  loop:
+    - name: normal case
+      output: ["/etc/letsencrypt/live/example/fullchain.pem"]
+      input: |-
+        server {
+        # test
+        ssl_certificate             /etc/letsencrypt/live/example/fullchain.pem;
+          ssl_certificate_key         /etc/letsencrypt/live/example/privkey.pem;
+        # test
+        }
+    - name: commented out
+      output: []
+      input: "  #  ssl_certificate             /etc/letsencrypt/live/example/fullchain.pem;"
+    - name: empty
+      output: []
+      input: ""
+  loop_control:
+    loop_var: test_item
+  vars:
+    item:
+      content: "{{ test_item.input }}"
+  ignore_errors: "{{ go_ci_ignore }}"

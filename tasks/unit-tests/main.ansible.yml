@@ -1,0 +1,12 @@
+---
+- name: Test nginx_get_cert
+  ansible.builtin.import_tasks:
+    file: unit-tests/nginx_get_cert.ansible.yml
+
+- name: Test nginx_get_info
+  ansible.builtin.import_tasks:
+    file: unit-tests/nginx_get_info.ansible.yml
+
+- name: Test nginx_get_key
+  ansible.builtin.import_tasks:
+    file: unit-tests/nginx_get_key.ansible.yml

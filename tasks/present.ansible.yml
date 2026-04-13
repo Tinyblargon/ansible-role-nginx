@@ -63,8 +63,9 @@
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
     - name: Invalid nginx config
-      ansible.builtin.fail:
+      ansible.builtin.debug:
         msg: "{{ ansible_failed_result.stderr_lines }}"
+      failed_when: true
 
 - name: Delete backup
   ansible.builtin.file:

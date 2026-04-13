@@ -14,15 +14,14 @@ name: CI
   schedule:
     - cron: "0 9 * * 1"
 
-defaults:
-  run:
-    working-directory: 'tinyblargon.nginx'
-
 jobs:
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tinyblargon.nginx
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5
@@ -42,9 +41,7 @@ jobs:
   unit-tests:
     name: Unit tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ansible-role-nginx
+
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5
@@ -62,6 +59,9 @@ jobs:
   molecule:
     name: Molecule
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tinyblargon.nginx
     strategy:
       fail-fast: false
       matrix:

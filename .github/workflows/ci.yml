@@ -42,6 +42,9 @@ jobs:
   unit-tests:
     name: Unit tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible-role-nginx
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v5

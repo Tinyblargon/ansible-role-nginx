@@ -26,4 +26,4 @@
   vars:
     item:
       content: "{{ test_item.input }}"
-  ignore_errors: "{{ go_ci_ignore }}"
+  ignore_errors: "{{ nginx_ci_ignore }}"

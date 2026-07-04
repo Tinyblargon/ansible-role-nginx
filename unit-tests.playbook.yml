@@ -3,7 +3,7 @@
   hosts: localhost
   gather_facts: false
   vars:
-    go_ci_ignore: false
+    nginx_ci_ignore: false
   tasks:
     - name: Run unit tests
       ansible.builtin.include_role:
